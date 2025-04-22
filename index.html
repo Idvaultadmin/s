@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Register</title>
+</head>
+<body>
+  <h1>User Registration</h1>
+  <form id="registerForm">
+    Username: <input type="text" id="username" required><br><br>
+    Password: <input type="password" id="password" required><br><br>
+    <button type="submit">Register</button>
+  </form>
+
+  <div id="output"></div>
+
+  <script>
+    let users = [];
+    const badWords = ["shit", "fuck", "bitch", "asshole"];
+    const leetVariants = {
+      a: "[a@4]",
+      i: "[i1!|]",
+      e: "[e3]",
+      o: "[o0]",
+      u: "[uü]",
+      s: "[s5$z]",
+      t: "[t7+]"
+    };
+
+    function buildRegex(word) {
+      let regex = word.split("").map(char => leetVariants[char] || char).join("");
+      return new RegExp(regex, "i");
+    }
+
+    const badWordPatterns = badWords.map(word => buildRegex(word));
+
+    function isClean(username) {
+      return !badWordPatterns.some(pattern => pattern.test(username));
+    }
+
+    document.getElementById("registerForm").addEventListener("submit", function(e) {
+      e.preventDefault();
+
+      const username = document.getElementById("username").value.trim();
+      const password = document.getElementById("password").value;
+
+      if (!isClean(username)) {
+        document.getElementById("output").textContent = "Please choose a cleaner username.";
+        return;
+      }
+
+      const newUser = {
+        id: users.length + 1,
+        username: username,
+        password: password // In real apps, NEVER store raw passwords!
+      };
+
+      users.push(newUser);
+      document.getElementById("output").innerHTML = `
+        Registered!<br>
+        Your ID is: <strong>${newUser.id}</strong><br>
+        Username: ${newUser.username}
+      `;
+
+      document.getElementById("registerForm").reset();
+    });
+  </script>
+</body>
+</html>
